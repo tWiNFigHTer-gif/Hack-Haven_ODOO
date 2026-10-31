@@ -17,3 +17,4 @@ export const staffTokens = {
     tabHeight: '44px',
   },
 } as const;
+

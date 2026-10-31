@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { StaffLayout } from '../../components/staff/StaffLayout';
 import { useToast } from '../../components/common/Toast';
 
-export type PaymentMethod = 'Credit Card' | 'Bank Transfer' | 'ACH Direct' | 'UPI' | 'Wire';
+export type PaymentMethod = 'Bank Wire' | 'Credit Card' | 'Direct Debit' | 'Check';
 
 export interface StaffPaymentRecord {
   id: string;
@@ -73,76 +73,76 @@ const CANDIDATE_INVOICES: InvoiceCandidate[] = [
 const INITIAL_PAYMENTS: StaffPaymentRecord[] = [
   {
     id: 'pay-001',
-    paymentNumber: 'PAY-2024-9912',
-    invoiceNumber: 'INV-2024-7719',
-    customerName: 'Meridian Health Ltd',
+    paymentNumber: 'PAY-2024-092',
+    invoiceNumber: 'INV-2024-118',
+    customerName: 'Meridian Health Systems',
     customerEmail: 'ap@meridianhealth.org',
-    method: 'Bank Transfer',
-    amount: 3200.0,
-    date: 'Oct 28, 2024',
+    method: 'Bank Wire',
+    amount: 19200.0,
+    date: 'Nov 18, 2024',
     referenceNumber: 'WIRE-891024-MRD',
     status: 'Completed',
     notes: 'Settled via Fedwire transfer directly into operational reserve.',
   },
   {
     id: 'pay-002',
-    paymentNumber: 'PAY-2024-8840',
-    invoiceNumber: 'INV-2024-4402',
-    customerName: 'Pinnacle Biometrics',
-    customerEmail: 'accounts@pinnaclebio.com',
-    method: 'ACH Direct',
-    amount: 8400.0,
-    date: 'Aug 24, 2024',
-    referenceNumber: 'ACH-440192-PIN',
-    status: 'Reconciled',
+    paymentNumber: 'PAY-2024-093',
+    invoiceNumber: 'INV-2024-114',
+    customerName: 'Horizon Digital Labs',
+    customerEmail: 'billing@horizondigitallabs.com',
+    method: 'Direct Debit',
+    amount: 6800.0,
+    date: 'Nov 18, 2024',
+    referenceNumber: 'DD-440192-HOR',
+    status: 'Completed',
     notes: 'Automatic monthly batch collection.',
   },
   {
     id: 'pay-003',
-    paymentNumber: 'PAY-2024-7721',
-    invoiceNumber: 'INV-2024-3310',
-    customerName: 'Omni Retail Group',
-    customerEmail: 'treasury@omniretail.com',
+    paymentNumber: 'PAY-2024-091',
+    invoiceNumber: 'INV-2024-110',
+    customerName: 'Acme Studio Inc.',
+    customerEmail: 'billing@acmestudio.io',
     method: 'Credit Card',
-    amount: 4500.0,
-    date: 'Jul 15, 2024',
+    amount: 3200.0,
+    date: 'Nov 15, 2024',
     referenceNumber: 'CC-AUTH-33918',
     status: 'Completed',
     notes: 'Stripe charge authorization ch_3Op199a.',
   },
   {
     id: 'pay-004',
-    paymentNumber: 'PAY-2024-6615',
-    invoiceNumber: 'INV-2024-1108',
-    customerName: 'Apex Cloud Solutions',
-    customerEmail: 'billing@apexcloud.io',
-    method: 'Wire',
-    amount: 12500.0,
-    date: 'Jun 30, 2024',
-    referenceNumber: 'WIRE-661520-APX',
-    status: 'Reconciled',
-    notes: 'Overseas SWIFT routing confirmed.',
+    paymentNumber: 'PAY-2024-090',
+    invoiceNumber: 'INV-2024-108',
+    customerName: 'Pacific Logistics Alliance',
+    customerEmail: 'finance@paclogalliance.com',
+    method: 'Direct Debit',
+    amount: 2450.0,
+    date: 'Nov 12, 2024',
+    referenceNumber: 'DD-661520-PAC',
+    status: 'Completed',
+    notes: 'Recurring monthly payment.',
   },
   {
     id: 'pay-005',
-    paymentNumber: 'PAY-2024-5509',
-    invoiceNumber: 'INV-2024-0994',
-    customerName: 'Hyperion Dynamics',
-    customerEmail: 'finance@hyperion.com',
+    paymentNumber: 'PAY-2024-094',
+    invoiceNumber: 'INV-2024-094',
+    customerName: 'Bluebird Media Group',
+    customerEmail: 'accounts@bluebirdmedia.com',
     method: 'Credit Card',
-    amount: 2750.0,
-    date: 'Jun 12, 2024',
+    amount: 650.0,
+    date: 'Today, 09:42 AM',
     referenceNumber: 'CC-AUTH-99411',
     status: 'Completed',
+    notes: 'Card authorization completed via payment gateway.',
   },
 ];
 
 const METHOD_BADGES: Record<PaymentMethod, { bg: string; text: string }> = {
+  'Bank Wire': { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/60', text: 'Bank Wire' },
   'Credit Card': { bg: 'bg-sky-50 text-sky-700 border-sky-200/60', text: 'Credit Card' },
-  'Bank Transfer': { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/60', text: 'Bank Transfer' },
-  'ACH Direct': { bg: 'bg-indigo-50 text-indigo-700 border-indigo-200/60', text: 'ACH Direct' },
-  UPI: { bg: 'bg-amber-50 text-amber-700 border-amber-200/60', text: 'UPI' },
-  Wire: { bg: 'bg-purple-50 text-purple-700 border-purple-200/60', text: 'Wire' },
+  'Direct Debit': { bg: 'bg-indigo-50 text-indigo-700 border-indigo-200/60', text: 'Direct Debit' },
+  'Check': { bg: 'bg-amber-50 text-amber-700 border-amber-200/60', text: 'Check' },
 };
 
 export const StaffPaymentsPage: React.FC = () => {
@@ -158,7 +158,7 @@ export const StaffPaymentsPage: React.FC = () => {
     candidateInvoices[0]?.invoiceNumber || ''
   );
   const [paymentAmount, setPaymentAmount] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Bank Transfer');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Bank Wire');
   const [paymentRef, setPaymentRef] = useState<string>('');
   const [paymentDate, setPaymentDate] = useState<string>(
     new Date().toISOString().split('T')[0]

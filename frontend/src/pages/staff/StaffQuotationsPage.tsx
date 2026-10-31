@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { StaffLayout } from '../../components/staff/StaffLayout';
 import { useToast } from '../../components/common/Toast';
 
-type QuotationStatus = 'Draft' | 'Quotation' | 'Confirmed' | 'Active' | 'Closed';
+type QuotationStatus = 'Draft' | 'Quotation' | 'Confirmed' | 'Active' | 'Closed' | 'Expired';
 
 interface QuotationLine {
   id: string;
@@ -19,6 +19,7 @@ interface Quotation {
   templateName: string;
   startDate: string;
   expiryDate: string;
+  issueDate: string;
   paymentTerms: string;
   notes: string;
   lines: QuotationLine[];
@@ -86,12 +87,32 @@ const TEMPLATES: TemplateBlueprint[] = [
 
 const INITIAL_QUOTATIONS: Quotation[] = [
   {
-    id: 'q-118',
-    quotationNumber: 'Q-2024-118',
-    customerName: 'Acme Studio (HQ)',
+    id: 'q-117',
+    quotationNumber: 'Q-2024-117',
+    customerName: 'Meridian Health Systems',
+    templateName: 'Enterprise Usage & Growth',
+    startDate: 'Nov 08, 2024',
+    expiryDate: 'Dec 08, 2024',
+    issueDate: 'Nov 08, 2024',
+    paymentTerms: 'Net 30',
+    notes: 'Enterprise compliance deployment with dedicated onboarding.',
+    lines: [
+      { id: 'l-0', product: 'Enterprise Volume Cluster (Annual)', quantity: 1, unitPrice: 30000.0, taxRate: 0.1 },
+      { id: 'l-0b', product: 'Priority 24/7 SLA Hotline', quantity: 1, unitPrice: 5000.0, taxRate: 0.1 },
+    ],
+    status: 'Confirmed',
+    subtotal: 35000.0,
+    tax: 3500.0,
+    total: 38500.0,
+  },
+  {
+    id: 'q-116',
+    quotationNumber: 'Q-2024-116',
+    customerName: 'Acme Studio Inc.',
     templateName: 'Standard SaaS Annual',
-    startDate: 'Nov 15, 2024',
-    expiryDate: 'Dec 15, 2024',
+    startDate: 'Nov 06, 2024',
+    expiryDate: 'Dec 06, 2024',
+    issueDate: 'Nov 06, 2024',
     paymentTerms: 'Net 30',
     notes: 'Annual contract cycle includes standard QBR milestone reviews and priority onboarding schedule.',
     lines: [
@@ -105,30 +126,13 @@ const INITIAL_QUOTATIONS: Quotation[] = [
     total: 15620.0,
   },
   {
-    id: 'q-112',
-    quotationNumber: 'Q-2024-112',
-    customerName: 'Horizon Media',
-    templateName: 'Enterprise Usage & Growth',
-    startDate: 'Nov 01, 2024',
-    expiryDate: 'Nov 30, 2024',
-    paymentTerms: 'Net 60',
-    notes: 'High-volume deployment awaiting security review sign-off.',
-    lines: [
-      { id: 'l-4', product: 'Enterprise Volume Cluster (Annual)', quantity: 1, unitPrice: 30000.0, taxRate: 0.1 },
-      { id: 'l-5', product: 'Priority 24/7 SLA Hotline', quantity: 1, unitPrice: 5000.0, taxRate: 0.1 },
-    ],
-    status: 'Confirmed',
-    subtotal: 35000.0,
-    tax: 3500.0,
-    total: 38500.0,
-  },
-  {
-    id: 'q-107',
-    quotationNumber: 'Q-2024-107',
-    customerName: 'Northwind Cloud',
+    id: 'q-115',
+    quotationNumber: 'Q-2024-115',
+    customerName: 'Kinetix Logistics',
     templateName: 'Starter Monthly',
-    startDate: 'Oct 20, 2024',
-    expiryDate: 'Nov 20, 2024',
+    startDate: 'Nov 05, 2024',
+    expiryDate: 'Nov 19, 2024',
+    issueDate: 'Nov 05, 2024',
     paymentTerms: 'Net 15',
     notes: 'Direct client checkout with recurring card authorization.',
     lines: [
@@ -139,6 +143,24 @@ const INITIAL_QUOTATIONS: Quotation[] = [
     tax: 120.0,
     total: 1320.0,
   },
+  {
+    id: 'q-104',
+    quotationNumber: 'Q-2024-104',
+    customerName: 'Bluebird Labs',
+    templateName: 'Standard SaaS Annual',
+    startDate: 'Oct 12, 2024',
+    expiryDate: 'Oct 26, 2024',
+    issueDate: 'Oct 12, 2024',
+    paymentTerms: 'Net 30',
+    notes: 'Quote lapsed — customer requested renewal at updated pricing.',
+    lines: [
+      { id: 'l-7', product: 'Platform Core SaaS (12 Months)', quantity: 1, unitPrice: 10000.0, taxRate: 0.1 },
+    ],
+    status: 'Expired',
+    subtotal: 10000.0,
+    tax: 1000.0,
+    total: 11000.0,
+  },
 ];
 
 const STATUS_BADGES: Record<QuotationStatus, { bg: string; text: string; dot: string }> = {
@@ -147,6 +169,7 @@ const STATUS_BADGES: Record<QuotationStatus, { bg: string; text: string; dot: st
   Confirmed: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
   Active: { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
   Closed: { bg: 'bg-slate-100', text: 'text-slate-500', dot: 'bg-slate-400' },
+  Expired: { bg: 'bg-rose-50', text: 'text-rose-700', dot: 'bg-rose-500' },
 };
 
 export const StaffQuotationsPage: React.FC = () => {
@@ -234,6 +257,7 @@ export const StaffQuotationsPage: React.FC = () => {
       templateName: selectedTemplate.name,
       startDate: formStartDate,
       expiryDate: formExpiryDate,
+      issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       paymentTerms: formTerms,
       notes: formNotes,
       lines: formLines,
@@ -668,12 +692,12 @@ export const StaffQuotationsPage: React.FC = () => {
       {/* ── EXISTING QUOTATIONS LEDGER ── */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-0.5">
             <h3 className="text-base font-bold text-slate-900">Existing Quotations Ledger</h3>
-            <span className="text-xs text-slate-400">({quotations.length} total)</span>
+            <p className="text-xs text-slate-500">Frontline queue and status tracking for customer proposals.</p>
           </div>
 
-          {/* Metric Status Chips */}
+          {/* Metric Status Chips — matching Stitch: All / In Review / Awaiting Client / Expired */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <button
               type="button"
@@ -695,7 +719,29 @@ export const StaffQuotationsPage: React.FC = () => {
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              Sent ({quotations.filter((q) => q.status === 'Quotation').length})
+              In Review ({quotations.filter((q) => q.status === 'Quotation').length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('Confirmed')}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                statusFilter === 'Confirmed'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              Awaiting Client ({quotations.filter((q) => q.status === 'Confirmed').length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('Expired')}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                statusFilter === 'Expired'
+                  ? 'bg-rose-600 text-white'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              Expired ({quotations.filter((q) => q.status === 'Expired').length})
             </button>
             <button
               type="button"
@@ -707,17 +753,6 @@ export const StaffQuotationsPage: React.FC = () => {
               }`}
             >
               Drafts ({quotations.filter((q) => q.status === 'Draft').length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter('Confirmed')}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
-                statusFilter === 'Confirmed'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              Confirmed ({quotations.filter((q) => q.status === 'Confirmed').length})
             </button>
           </div>
         </div>
@@ -732,31 +767,32 @@ export const StaffQuotationsPage: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter by customer, quote #..."
+              placeholder="Filter by customer, quote #, creator..."
               className="w-full h-8 pl-8 pr-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
         </div>
 
-        {/* Quotations Table */}
+        {/* Quotations Table — columns: Ref #, Customer (with avatar), Template Type, Issue Date, Expiry, Value, Status, Action */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
                 <tr className="h-9 bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] font-semibold uppercase tracking-wider select-none">
-                  <th className="px-4 py-2">Quotation #</th>
+                  <th className="px-4 py-2">Ref #</th>
                   <th className="px-4 py-2">Customer</th>
-                  <th className="px-4 py-2">Blueprint Template</th>
-                  <th className="px-4 py-2">Valid Until</th>
-                  <th className="px-4 py-2 text-right">Total Amount</th>
+                  <th className="px-4 py-2">Template Type</th>
+                  <th className="px-4 py-2">Issue Date</th>
+                  <th className="px-4 py-2">Expiry</th>
+                  <th className="px-4 py-2 text-right">Value</th>
                   <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2 text-right">Actions</th>
+                  <th className="px-4 py-2 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredQuotations.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-10 px-4 text-center">
+                    <td colSpan={8} className="py-10 px-4 text-center">
                       <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
                         <span className="material-symbols-outlined text-[24px] text-slate-400 mb-1">request_quote</span>
                         <h4 className="text-sm font-semibold text-slate-900">No quotations found</h4>
@@ -767,38 +803,86 @@ export const StaffQuotationsPage: React.FC = () => {
                 ) : (
                   filteredQuotations.map((q) => {
                     const badge = STATUS_BADGES[q.status];
+                    // Customer avatar initials
+                    const initials = q.customerName
+                      .split(' ')
+                      .slice(0, 2)
+                      .map((w) => w[0])
+                      .join('')
+                      .toUpperCase();
+                    const avatarColors: Record<string, string> = {
+                      M: 'bg-blue-100 text-blue-700',
+                      A: 'bg-emerald-100 text-emerald-700',
+                      K: 'bg-amber-100 text-amber-700',
+                      B: 'bg-rose-100 text-rose-700',
+                      H: 'bg-purple-100 text-purple-700',
+                      N: 'bg-sky-100 text-sky-700',
+                      V: 'bg-teal-100 text-teal-700',
+                    };
+                    const avatarColor = avatarColors[initials[0]] || 'bg-slate-100 text-slate-600';
+
+                    // Context-sensitive action button
+                    const actionLabel =
+                      q.status === 'Confirmed'
+                        ? 'View'
+                        : q.status === 'Quotation'
+                        ? 'Convert'
+                        : q.status === 'Expired'
+                        ? 'Reopen'
+                        : 'Edit';
+
                     return (
                       <tr key={q.id} className="h-11 hover:bg-slate-50/70 transition-colors">
                         <td className="px-4 py-2 font-mono font-semibold text-xs text-[#0F766E]">
                           {q.quotationNumber}
                         </td>
-                        <td className="px-4 py-2 font-medium text-xs text-slate-900">
-                          {q.customerName}
+                        <td className="px-4 py-2">
+                          <div className="flex items-center gap-2">
+                            {/* Customer avatar initials */}
+                            <div
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${avatarColor}`}
+                            >
+                              {initials}
+                            </div>
+                            <span className="font-medium text-xs text-slate-900">{q.customerName}</span>
+                          </div>
                         </td>
-                        <td className="px-4 py-2 text-xs text-slate-600">
-                          {q.templateName}
-                        </td>
-                        <td className="px-4 py-2 text-xs text-slate-500">
+                        <td className="px-4 py-2 text-xs text-slate-600">{q.templateName}</td>
+                        <td className="px-4 py-2 text-xs text-slate-500">{q.issueDate || q.startDate}</td>
+                        <td className={`px-4 py-2 text-xs font-medium ${q.status === 'Expired' ? 'text-rose-600' : 'text-slate-500'}`}>
                           {q.expiryDate}
                         </td>
                         <td className="px-4 py-2 text-right font-semibold text-xs text-slate-900 tabular-nums">
                           ${q.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </td>
                         <td className="px-4 py-2">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text}`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text}`}
+                          >
                             <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                            {q.status}
+                            {q.status === 'Quotation' ? 'Quotation' : q.status}
                           </span>
                         </td>
                         <td className="px-4 py-2 text-right">
                           <button
                             type="button"
                             onClick={() => {
-                              showToast(`Loaded details for ${q.quotationNumber}`, 'info');
+                              showToast(
+                                q.status === 'Expired'
+                                  ? `Reopening ${q.quotationNumber}…`
+                                  : q.status === 'Quotation'
+                                  ? `Converting ${q.quotationNumber} to confirmed order`
+                                  : `Loaded ${q.quotationNumber}`,
+                                'info'
+                              );
                             }}
-                            className="h-7 px-2.5 rounded-md bg-white hover:bg-slate-50 text-[#0F766E] border border-slate-200 text-xs font-semibold shadow-2xs"
+                            className={`h-7 px-2.5 rounded-md text-xs font-semibold shadow-2xs transition-colors ${
+                              actionLabel === 'Convert'
+                                ? 'bg-teal-700 text-white hover:bg-teal-800'
+                                : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
+                            }`}
                           >
-                            Review
+                            {actionLabel}
                           </button>
                         </td>
                       </tr>
