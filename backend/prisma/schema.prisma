@@ -1,0 +1,170 @@
+// Prisma Schema for Subscription Management System
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CUSTOMER
+}
+
+enum BillingInterval {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+model Organization {
+  id            String         @id @default(uuid())
+  name          String
+  slug          String         @unique
+  billingEmail  String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  users         User[]
+  subscriptions Subscription[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String        @id @default(uuid())
+  organizationId String?
+  email          String        @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  role           Role          @default(CUSTOMER)
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  auditLogs      AuditLog[]
+
+  @@index([organizationId])
+  @@index([role])
+  @@map("users")
+}
+
+model Plan {
+  id              String          @id @default(uuid())
+  code            String          @unique // e.g. "STARTER_MONTHLY", "ENTERPRISE_ANNUAL"
+  name            String          // e.g. "Starter Plan", "Enterprise Plan"
+  description     String?
+  priceInCents    Int
+  currency        String          @default("USD")
+  interval        BillingInterval @default(MONTHLY)
+  trialPeriodDays Int             @default(0)
+  maxSeats        Int             @default(1)
+  features        Json            @default("[]")
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  subscriptions   Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                 String             @id @default(uuid())
+  organizationId     String
+  planId             String
+  status             SubscriptionStatus @default(TRIALING)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
+  canceledAt         DateTime?
+  trialEndsAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan               Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+  invoices           Invoice[]
+  usageRecords       UsageRecord[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  subscriptionId String
+  invoiceNumber  String        @unique // e.g. "INV-2026-0001"
+  amountDueCents Int
+  amountPaidCents Int          @default(0)
+  currency       String        @default("USD")
+  status         InvoiceStatus @default(OPEN)
+  dueDate        DateTime
+  paidAt         DateTime?
+  billingReason  String        @default("subscription_cycle")
+  pdfUrl         String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model UsageRecord {
+  id             String       @id @default(uuid())
+  subscriptionId String
+  metricName     String       // e.g. "api_calls", "storage_mb"
+  quantity       Int
+  recordedAt     DateTime     @default(now())
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, metricName])
+  @@map("usage_records")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String   // e.g. "SUBSCRIPTION_UPGRADED", "INVOICE_GENERATED"
+  entity     String   // e.g. "Subscription", "Plan"
+  entityId   String
+  metadata   Json     @default("{}")
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@map("audit_logs")
+}
+
