@@ -59,6 +59,28 @@ export default {
         "status-closed-text": "#64748B",
         error: "#ba1a1a",
         "error-container": "#ffdad6",
+
+        // Admin Portal Design Tokens (DESIGN.md)
+        admin: {
+          bg: "#F8FAFC",
+          surface: "#FFFFFF",
+          sidebar: "#0F172A",
+          "sidebar-text": "#CBD5E1",
+          "sidebar-hover": "#1E293B",
+          "sidebar-active": "#1E293B",
+          primary: "#0F172A",
+          secondary: "#64748B",
+          muted: "#94A3B8",
+          accent: "#4F46E5",
+          "accent-hover": "#4338CA",
+          "accent-subtle": "#EEF2FF",
+          border: "#E2E8F0",
+          chart1: "#4F46E5",
+          chart2: "#0EA5E9",
+          chart3: "#10B981",
+          chart4: "#F59E0B",
+          chart5: "#EF4444",
+        },
       },
       borderRadius: {
         card: "14px",
