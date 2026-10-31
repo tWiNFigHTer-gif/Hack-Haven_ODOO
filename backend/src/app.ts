@@ -19,16 +19,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(express.json());
 
-app.get('/', (_req: Request, res: Response) => {
+app.get(['/', '/health'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     message: 'Subscription Management System API is running',
     health: '/api/health',
     api: '/api',
+    meta: '/api/v1/meta',
   });
 });
 
-app.get('/api', (_req: Request, res: Response) => {
+app.get(['/api', '/api/v1', '/api/v1/meta'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     message: 'Subscription Management System API v1',
@@ -51,6 +52,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 
 app.use('/api', routes);
+app.use('/api/v1', routes);
 
 app.use(errorHandler);
-
