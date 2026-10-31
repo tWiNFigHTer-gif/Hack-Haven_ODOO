@@ -1,0 +1,95 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        // Core Brand Terracotta
+        primary: "#7d4427",
+        "primary-container": "#9a5b3c",
+        "accent-hover": "#7F4A30",
+        "primary-fixed": "#ffdbcc",
+        "primary-fixed-dim": "#ffb694",
+        "on-primary": "#ffffff",
+        "on-primary-container": "#ffe8df",
+
+        // Canvas & Surface
+        "background-canvas": "#FAF7F2",
+        "surface-card": "#FFFFFF",
+        surface: "#fff8f5",
+        "surface-bright": "#fff8f5",
+        "surface-dim": "#e0d8d5",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#faf2ee",
+        "surface-container": "#f4ece8",
+        "surface-container-high": "#eee7e3",
+        "surface-container-highest": "#e9e1dd",
+        "surface-variant": "#e9e1dd",
+
+        // Text & Contrast
+        "on-surface": "#1e1b19",
+        "on-surface-variant": "#53443d",
+        secondary: "#645d58",
+        "on-secondary": "#ffffff",
+        "secondary-container": "#eae1da",
+        "border-subtle": "#E7E0D6",
+        outline: "#85736c",
+        "outline-variant": "#d8c2b9",
+
+        // Status Tokens
+        "status-active-bg": "#D1FAE5",
+        "status-active-text": "#059669",
+        "status-outstanding-bg": "#FEF3C7",
+        "status-outstanding-text": "#D97706",
+        "status-overdue-bg": "#FEE2E2",
+        "status-overdue-text": "#DC2626",
+        "status-confirmed-bg": "#DBEAFE",
+        "status-confirmed-text": "#2563EB",
+        "status-quotation-bg": "#F3E8FF",
+        "status-quotation-text": "#7C3AED",
+        "status-paused-bg": "#FEF3C7",
+        "status-paused-text": "#B45309",
+        "status-draft-bg": "#F1F5F9",
+        "status-draft-text": "#475569",
+        "status-closed-bg": "#E2E8F0",
+        "status-closed-text": "#64748B",
+        error: "#ba1a1a",
+        "error-container": "#ffdad6",
+      },
+      borderRadius: {
+        card: "14px",
+        btn: "10px",
+        input: "6px",
+        badge: "6px",
+      },
+      fontFamily: {
+        serif: ["'Noto Serif'", "serif"],
+        sans: ["'Inter'", "sans-serif"],
+        display: ["'Noto Serif'", "serif"],
+        headline: ["'Noto Serif'", "serif"],
+      },
+      boxShadow: {
+        card: "0 4px 20px -2px rgba(28, 25, 23, 0.05)",
+        "card-hover": "0 6px 24px -2px rgba(28, 25, 23, 0.08)",
+        modal: "0 12px 36px -4px rgba(28, 25, 23, 0.12)",
+      },
+      spacing: {
+        gutter: "1.5rem",
+        "gutter-sm": "1rem",
+        margin: "2rem",
+        "margin-mobile": "1rem",
+        "space-xs": "0.25rem",
+        "space-sm": "0.5rem",
+        "space-md": "1rem",
+        "space-lg": "1.5rem",
+        "space-xl": "2rem",
+      },
+    },
+  },
+  plugins: [],
+};
+
