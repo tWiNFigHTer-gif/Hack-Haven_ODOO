@@ -21,6 +21,12 @@ import { AdminSubscriptionsPage } from './pages/admin/AdminSubscriptionsPage';
 import { AdminInvoicesPage } from './pages/admin/AdminInvoicesPage';
 import { AdminPaymentsPage } from './pages/admin/AdminPaymentsPage';
 import { AdminStaffPage } from './pages/admin/AdminStaffPage';
+// Staff pages
+import { StaffTodayPage } from './pages/staff/StaffTodayPage';
+import { StaffQuotationsPage } from './pages/staff/StaffQuotationsPage';
+import { StaffSubscriptionsPage } from './pages/staff/StaffSubscriptionsPage';
+import { StaffInvoicesPage } from './pages/staff/StaffInvoicesPage';
+import { StaffPaymentsPage } from './pages/staff/StaffPaymentsPage';
 
 const LayoutWrapper: React.FC<{
   user: User | null;
@@ -87,6 +93,22 @@ export const App: React.FC = () => {
           <Route path="/admin/invoices" element={<AdminInvoicesPage />} />
           <Route path="/admin/payments" element={<AdminPaymentsPage />} />
           <Route path="/admin/staff" element={<AdminStaffPage />} />
+
+          {/* ── Staff Portal routes (top navigation tabs, teal theme) ── */}
+          <Route path="/staff" element={<Navigate to="/staff/today" replace />} />
+          <Route path="/staff/today" element={<StaffTodayPage />} />
+          <Route path="/staff/quotations" element={<StaffQuotationsPage />} />
+          <Route path="/staff/subscriptions" element={<StaffSubscriptionsPage />} />
+          <Route path="/staff/subscriptions/:id" element={<StaffSubscriptionsPage />} />
+          <Route path="/staff/invoices" element={<StaffInvoicesPage />} />
+          <Route path="/staff/payments" element={<StaffPaymentsPage />} />
+
+          {/* Role block for staff attempting to access forbidden admin routes */}
+          <Route path="/staff/products" element={<Navigate to="/staff/today" replace />} />
+          <Route path="/staff/plans" element={<Navigate to="/staff/today" replace />} />
+          <Route path="/staff/discounts" element={<Navigate to="/staff/today" replace />} />
+          <Route path="/staff/taxes" element={<Navigate to="/staff/today" replace />} />
+          <Route path="/staff/dashboard" element={<Navigate to="/staff/today" replace />} />
 
           {/* ── Customer portal routes (Navbar + Footer) ── */}
           <Route
