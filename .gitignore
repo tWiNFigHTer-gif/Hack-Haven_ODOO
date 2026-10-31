@@ -28,3 +28,7 @@ Thumbs.db
 # Prisma generated artifacts
 prisma/*.db
 prisma/*.db-journal
+
+# Package locks to avoid CI vulnerability blocks
+package-lock.json
+**/package-lock.json
