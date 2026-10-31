@@ -19,6 +19,33 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(express.json());
 
+app.get('/', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    message: 'Subscription Management System API is running',
+    health: '/api/health',
+    api: '/api',
+  });
+});
+
+app.get('/api', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    message: 'Subscription Management System API v1',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      users: '/api/users',
+      catalog: '/api/catalog',
+      taxes: '/api/taxes',
+      discounts: '/api/discounts',
+      templates: '/api/templates',
+      payments: '/api/payments',
+      me: '/api/me',
+    },
+  });
+});
+
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
